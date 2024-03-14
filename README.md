@@ -6,10 +6,16 @@ When I was thinking about this, I realized I had a project on the backburner for
 
 With some very Basic Javascript, HTML, and minimal CSS, I created this thing that makes accessing these videos a much more streamline process. I hope you enjoy using it.
 
+##Uses
+
+Used mostly for pre-event-scouting or match review
+
 ## How to use
 
 To use this program, all you have to do is download it and open it in any web browser. Input the team number you want to scout, select the event you're scouting, then select the match you want to scout. If there's a video, it should display on your screen
 
-## Please Note
+##updates
 
-I know that this isn't optimized whatsoever, and it probably wouldn't work on many screen types like phones. I literally started this a few minutes ago, and I hope to update it in the future to make it more user friendly. If any errors occur, I'm sorry. Please bear with me.
+v1.0 - the most bare-bones version of the tool, no UI, poor styling, no mobile device support
+
+v2.0 - after a few hours, I designed the UI for this and It works on all devices and makes the process much easier
