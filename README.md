@@ -14,7 +14,7 @@ Used mostly for pre-event-scouting or match review
 
 To use this program, all you have to do is download it and open it in any web browser. Input the team number you want to scout, select the event you're scouting, then select the match you want to scout. If there's a video, it should display on your screen
 
-##updates
+## updates
 
 v1.0 - the most bare-bones version of the tool, no UI, poor styling, no mobile device support
 
