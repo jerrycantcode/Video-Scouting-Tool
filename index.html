@@ -11,18 +11,104 @@
             display: flex;
             justify-content: center;
             flex-direction: column;
+            text-align: center;
         }
         .teamNumConfig {
+            margin-top: 10px;
             display: flex;
             justify-content: center;
+        }
+        .teamNumConfig button {
+            border: 2px solid rgb(183, 0, 0);
+            border-radius: 5px;
         }
         .teamNumConfig input {
             padding: 8px;
             font-size: 16px;
             border-radius: 5px;
-            border: 2px solid black;
+            border: 2px solid rgb(183, 0, 0);
             margin-right: 20px;
         }
+        #events {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #matches {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .sel {
+            margin: 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            background-color: rgb(221, 221, 221);
+            border: 3px solid rgb(183, 0, 0);
+        }
+        .select {
+            overflow: hidden;
+            transition: 0.5s ease;
+            height: auto;
+        }
+        .select div {
+            background-color: rgb(206, 206, 206);
+            padding: 10px;
+            transition: 0.5s ease;
+            margin: 10px 30px 10px 30px;
+            border-radius: 5px;
+            height: 20px;
+            border: 2px solid rgb(183, 0, 0);
+        }
+        .select div:hover {
+            background-color: rgb(187, 187, 187);
+            cursor: pointer;
+        }
+        .selHeader {
+            font-size: 22px;
+            padding: 5px;
+            padding-top: 5px;
+            margin-bottom: 0px;
+        }
+        .selHeader:hover{
+            cursor: pointer;
+        }
+
+        .collapsed {
+            opacity: 0;
+            height: 0px;
+        }
+        .expanded {
+            opacity: 1;
+        }
+
+    .transition-element {
+        transition: opacity 0.5s ease, height 0.5s ease;
+    }
+    .container {
+  position: relative;
+  width: 95%;
+  height: 95%;
+  margin: 2.5%;
+  overflow: hidden; /* Prevents iframe from overflowing container */
+}
+
+iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgb(183, 0, 0);
+  border-radius: 7px;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
     </style>
 </head>
 <body>
@@ -30,21 +116,31 @@
     <input type="text" id="teamNumberInput" placeholder="Team Number..."></input>
     <button id="viewEvents" onclick="viewEvents()">View Matches</button>
     </div>
-    <div id="events">
+    <div class="sel" id="events">
+        <div onclick="expandEvents()" class="selHeader">Select Event</div>
+        <div class="select" id="eventss">
 
+        </div>
     </div>
-    <div id="matches">
+    <div class="sel" id="matches">
+        <div onclick="expandMatches()" class="selHeader">Select Match</div>
+        <div class="select" id="matchess">
 
+        </div>
     </div>
-    <iframe id="vidFrame" width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <div class="container">
+    <iframe id="vidFrame" style="visibility: hidden;" width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
     <script>
         const teamNumberInput = document.getElementById('teamNumberInput')
-        const events = document.getElementById('events')
-        const matches = document.getElementById('matches')
+        const events = document.getElementById('eventss')
+        const matches = document.getElementById('matchess')
         const vidFrame = document.getElementById('vidFrame')
 
         var num;
         var year;
+        expandEvents();
+        expandMatches();
 
         
         hide('teamNumberInput')
@@ -60,7 +156,7 @@
                 'X-TBA-Auth-Key': '3rTF5gxmIdJSYKqhKohNTzEKl7D9x04ivAFGYzOumRgHdqIA6acFssENXYNkfCK7'
             }
         }
-
+        var eventHeight;
         function viewEvents(){
             num = teamNumberInput.value;
             var url = `https://www.thebluealliance.com/api/v3/team/frc${num}/events/${year}/simple`
@@ -72,32 +168,50 @@
                     hide('matches')
                     hide('vidFrame')
                     events.innerHTML = ''
+                    var numOfEvents = 0;
                     for(let i = 0; i < data.length; i++) {
-                        events.innerHTML += `<div onclick="viewMatches('${data[i].key}')">${data[i].name}</div>`
+                        const inputDate = data[i].start_date;
+                        const hasPassed = isDatePassed(inputDate);
+                        if(hasPassed) {
+                            numOfEvents++;
+                            events.innerHTML += `<div onclick="viewMatches('${data[i].key}')">${data[i].name}</div>`
+                        }
                     }
+                    eventHeight = (numOfEvents * 50) + 20 + "px"
+                    expandEvents();
                     show('events')
                 })
                 .catch(error => console.log(errorMsg.msg))
         }
+        var matchHeight;
 
         function viewMatches(key){
-            var url = `https://www.thebluealliance.com/api/v3/team/frc${num}/event/${key}/matches`
 
-            fetch(url,options)
-                .then(res => res.json())
-                .then(data => {
-                    hide('matches')
-                    hide('vidFrame')
-                    matches.innerHTML = ''
-                    for(let i = 0; i < data.length; i++) {
-                        matches.innerHTML += `<div onclick="showVideo('${data[i].key}')">${data[i].key}</div>`
-                    }
-                    show('matches')
-                })
-                .catch(error => console.log(error))
+
+                collapseEvents();
+
+var url = `https://www.thebluealliance.com/api/v3/team/frc${num}/event/${key}/matches`
+
+fetch(url,options)
+    .then(res => res.json())
+    .then(data => {
+        hide('matches')
+        hide('vidFrame')
+        matches.innerHTML = ''
+        for(let i = 0; i < data.length; i++) {
+            matches.innerHTML += `<div onclick="showVideo('${data[i].key}')">${data[i].key}</div>`
         }
+        matchHeight = (data.length * 50) + 20 + "px"
+        expandMatches();
+        show('matches')
+    })
+    .catch(error => console.log(error))
+            }
+        
 
         function showVideo(matchKey) {
+            collapseMatches();
+
             var url = `https://www.thebluealliance.com/api/v3/match/${matchKey}`
 
             fetch(url,options)
@@ -131,6 +245,61 @@
         function hide(id) {
             document.getElementById(id).style.visibility = "hidden"
         }
+        function collapseEvents() {
+            events.classList.add("transition-element");
+            events.classList.add("collapsed");
+            events.classList.remove("expanded");
+            events.style.height = "0px";
+        }
+        function expandEvents() {
+            events.classList.add("transition-element");
+            events.classList.remove("collapsed");
+            events.classList.add("expanded");
+            events.style.height = eventHeight;
+        }
+        function collapseMatches() {
+            matches.classList.add("transition-element");
+            matches.classList.add("collapsed");
+            matches.classList.remove("expanded");
+            matches.style.height = "0px";
+        }
+        function expandMatches() {
+            matches.classList.add("transition-element");
+            matches.classList.remove("collapsed");
+            matches.classList.add("expanded");
+            matches.style.height = matchHeight;
+        }
+        function extractDateComponents(dateString) {
+    // Split the date string by '-' to get year, month, and day
+    const [year, month, day] = dateString.split('-');
+    
+    // Return an object containing the extracted components
+    return {
+        year: parseInt(year),
+        month: parseInt(month),
+        day: parseInt(day)
+    };
+}
+
+function isDatePassed(dateString) {
+    const today = new Date();
+    const currentDate = extractDateComponents(today.toISOString().slice(0, 10));
+    const providedDate = extractDateComponents(dateString);
+    
+    // Compare year, month, and day
+    if (providedDate.year < currentDate.year) {
+        return true;
+    } else if (providedDate.year === currentDate.year && providedDate.month < currentDate.month) {
+        return true;
+    } else if (providedDate.year === currentDate.year && providedDate.month === currentDate.month && providedDate.day < currentDate.day) {
+        return true;
+    }
+    
+    return false;
+}
+
+// Example usage:
+
         init();
 
     </script>
