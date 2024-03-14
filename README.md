@@ -6,7 +6,7 @@ When I was thinking about this, I realized I had a project on the backburner for
 
 With some very Basic Javascript, HTML, and minimal CSS, I created this thing that makes accessing these videos a much more streamline process. I hope you enjoy using it.
 
-##Uses
+## Uses
 
 Used mostly for pre-event-scouting or match review
 
